@@ -52,15 +52,17 @@ const quesJSON = [
 const questionEl = document.getElementById("question");
 const optionEl = document.getElementById("options");
 const scoreEl = document.getElementById("score");
+const nextbtn = document.getElementById("next");
 let score = 0;
+let currentQuestion = 0;
 
-// console.log(quesJSON);
-displayQuestion(quesJSON, 0);
+displayQuestion(quesJSON);
+nextbtn.addEventListener("click", () => {
+	displayNextQuestion();
+});
 
-function displayQuestion(questionObj, i) {
-	// console.log(questionObj[i]);
-
-	const { correctAnswer, options, question } = questionObj[i];
+function displayQuestion(questionObj) {
+	const { correctAnswer, options, question } = questionObj[currentQuestion];
 
 	questionEl.textContent = question;
 
@@ -81,15 +83,18 @@ function displayQuestion(questionObj, i) {
 
 	// console.log(optionEl);
 
-	evaluateAnswer(questionObj, i);
+	evaluateAnswer(questionObj);
 }
 
-function evaluateAnswer(questionObj, i) {
+function evaluateAnswer(questionObj) {
 	const answers = document.querySelectorAll(".option");
 
 	answers.forEach((answer) => {
 		answer.addEventListener("click", (e) => {
-			if (e.target.innerText.trim() === questionObj[i].correctAnswer.trim()) {
+			if (
+				e.target.innerText.trim() ===
+				questionObj[currentQuestion].correctAnswer.trim()
+			) {
 				score++;
 				scoreEl.innerText = `Score ${score}`;
 			} else {
@@ -97,13 +102,19 @@ function evaluateAnswer(questionObj, i) {
 				scoreEl.innerText = `Score ${score}`;
 			}
 
-			if (i < questionObj.length - 1) {
-				optionEl.textContent = "";
-				displayQuestion(questionObj, i + 1);
-			} else {
-				questionEl.innerText = "Quiz Completed !";
-				optionEl.textContent = "";
-			}
+			displayNextQuestion();
 		});
 	});
+}
+
+function displayNextQuestion() {
+	if (currentQuestion < quesJSON.length - 1) {
+		optionEl.textContent = "";
+		currentQuestion++;
+		displayQuestion(quesJSON);
+	} else {
+		questionEl.innerText = "Quiz Completed !";
+		optionEl.textContent = "";
+		nextbtn.remove();
+	}
 }
